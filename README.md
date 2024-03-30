@@ -30,10 +30,13 @@ Projekt je sestaven pro OS Windows 10 a vyšší.
    1. Extrahovat ze seznamu instancí kontejnerů sousedících se symboly jejich číslo s pomocí .Select() rozšíření z knihovny LinQ
    2. Spočítat součet instancí kontejnerů sousedících se symboly s pomocí .Sum() rozšíření z knihovny LinQ
 ## Optimalizace
-- Program je napsaný v jazyce C#, který dosahuje větší rychlosti než interpetované jazyky jako např. Python či JavaScript.
+- Program je napsaný v jazyce C#, který dosahuje větší rychlosti než interpretované jazyky jako např. Python či JavaScript.
 - Publikovaná verze (s optimalizacemi kompilátoru) dosahuje zvýšení výkonu programu až o 25 %.
 - Regular expression vzor je kompilovaný, čímž se snižuje množství času na provedení kroků 1. až 5. až o 23 %.
 - Počítání velikosti skladiště probíhá bez využítí string.Split(). Využití tohoto způsobu by vytvořilo array v paměti velikosti větší než původní vstupní string.
 - Ač může být vstupní řetězec opravdu velký, nevytvářejí se jeho kopie, v paměti existuje jen jednou, existují jen reference na něj.
 ## Výsledek
 - Spočtený výsledek pro velkou mapu: **557705**
+## Extras
+- Při debuggingu se nejen zobrazuje čas, který trvalo hledání výsledku, ale i vizuální výpis kontejnerů do konzole pro lepší představu.
+- Zdrojový kód je napsán anglicky a zároveň obsahuje popisky tříd, metod a vlastností.
