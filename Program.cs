@@ -11,7 +11,7 @@ internal class Program
 	{
 		string input;
 #if DEBUG
-		input = File.ReadAllText("../../../input data/warehouse map large.txt");
+		input = File.ReadAllText("../../../input data/warehouse map large CRLF.txt");
 #else
 		input = Console.In.ReadToEnd();
 #endif
