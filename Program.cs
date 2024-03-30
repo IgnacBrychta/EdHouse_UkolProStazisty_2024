@@ -1,6 +1,5 @@
-﻿#define DEV
-//#undef DEV
-using EdHouse_UkolProStazisty_2024.Models;
+﻿using EdHouse_UkolProStazisty_2024.Models;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace EdHouse_UkolProStazisty_2024;
@@ -9,27 +8,24 @@ internal class Program
 	static void Main(string[] args)
 	{
 		string input;
-#if DEV
-		input = File.ReadAllText("../../../input data/mapka.txt");
+#if DEBUG
+		input = File.ReadAllText("../../../input data/mapka original.txt");
 #else
 		input = Console.In.ReadToEnd();
 #endif
-
-#warning break down ContainerFinder
-		List<Container> containers = ContainerFinder.FindAllContainers(input);
-		List<Point> symbols = ContainerFinder.FindAllSymbols(input);
+		Stopwatch stopwatch = new Stopwatch();
+		stopwatch.Start();
+		Warehouse warehouse = new Warehouse(input);
+		List<Container> containers = ContainerFinder.FindAllContainers(warehouse);
+		List<Point> symbols = ContainerFinder.FindAllSymbols(warehouse);
 		List<Container> containersNearSymbols = ContainerFinder.FindContainersNextToSymbols(containers, symbols);
         int sumOfContainerNumbers = containersNearSymbols.Select(c => c.Number).Sum();
+		stopwatch.Stop();
 		Console.WriteLine(sumOfContainerNumbers.ToString());
-
-		Rectangle warehouseSize = ContainerFinder.GetWarehouseSize(input);
-		Visualizer.Visualize(containers, containersNearSymbols, symbols, warehouseSize);
+#if DEBUG
+        Console.WriteLine($"Time elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
+		Visualizer.Visualize(containers, containersNearSymbols, symbols, warehouse.Size);
 		Console.ReadKey();
+#endif
 	}
 }
-
-// specialni znaky
-// *=/%#&$-@+
-// regex
-// (?<!\d)\d{5}(?!\d)
-// některé kontejnery existují dvakrát se stejným číslem
