@@ -12,17 +12,16 @@ internal class Program
 		string input;
 #if DEBUG
 		input = File.ReadAllText("../../../input data/warehouse map large CRLF.txt");
+		Stopwatch stopwatch = new Stopwatch();
+		stopwatch.Start();
 #else
 		input = Console.In.ReadToEnd();
 #endif
-		Stopwatch stopwatch = new Stopwatch();
-		stopwatch.Start();
 		Warehouse warehouse = new Warehouse(input);
 		List<Container> containers = ContainerFinder.FindAllContainers(warehouse);
 		List<Point> symbols = ContainerFinder.FindAllSymbols(warehouse);
 		List<Container> containersNearSymbols = ContainerFinder.FindContainersAdjacentSymbols(containers, symbols);
         int sumOfContainerNumbers = containersNearSymbols.Select(c => c.Number).Sum();
-		stopwatch.Stop();
 
 		Console.WriteLine(
 #if DEBUG
@@ -31,6 +30,7 @@ internal class Program
 			sumOfContainerNumbers.ToString());
 
 #if DEBUG
+		stopwatch.Stop();
         Console.WriteLine($"Time elapsed: {stopwatch.Elapsed.TotalMilliseconds} ms");
 		Visualizer.Visualize(containers, containersNearSymbols, symbols, warehouse.Size);
 		Console.ReadKey();
