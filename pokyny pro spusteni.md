@@ -40,5 +40,3 @@ Projekt je sestaven pro OS Windows 10 a vyšší. Pro spuštění NENÍ třeba m
 ## Extras
 - Při debuggingu se nejen zobrazuje čas, který trvalo hledání výsledku, ale i vizuální výpis kontejnerů do konzole pro lepší představu.
 - Zdrojový kód je napsán anglicky a zároveň obsahuje popisky tříd, metod a vlastností.
-
-Autor: Richard Winter
