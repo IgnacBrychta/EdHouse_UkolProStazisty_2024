@@ -1,44 +1,52 @@
-# Stáž 2024 – Skladník Eda
-## Popis
-Zadání je splněno v prostředí .NET 7 s pomocí jazyka C#. Vývojovým prostředím bylo Microsoft Visual Studio 2022.
-Projekt je sestaven pro OS Windows 10 a vyšší. Pro spuštění NENÍ třeba mít nainstalované rozhraní .NET
-## Spuštění
-1. Stáhnout *.zip soubor s projektem a extrahovat jej
-2. Otevřít příkazový řádek s adresářem ve složce projektu
-3. Navigovat do `EdHouse_UkolProStazisty_2024\bin\Release\`
-4. Napsat do příkazového řádku `EdHouse_UkolProStazisty_2024.exe < cesta_k_souboru_s_mapou_skladiste.txt`
-   1. `cesta_k_souboru_s_mapou_skladiste.txt` nahradit absolutní či relativní cestou k libovolnému souboru obsahující mapu skladiště
-   2. Též je možné využít dvou přiložených ukázkových souborů pomocí `"../../Input Data/warehouse map large CRLF.txt"`
-5. Zanalyzovat výsledek
-## Princip fungování
-1. Vytvořit instanci třídy Warehouse
-   1. Při volání konstruktoru spočítat velikost skladiště (řádky, sloupce)
-2. Najít v instanci všechny kontejnery
-   1. Na základě vzoru `\\d{1,}` najít všechny podřetězce, které obsahují jedno nebo více číslic
-   2. S pomocí match.Index a velikosti skladiště spočítat souřadnice nejzažšího levého bodu kontejneru
-   3. Vytvořit instanci nalezeného kontejneru
-3. Najít v instanci všechny symboly
-   1. Na základě vzoru `[^.\\d\r\n]` najít všechny podřetězce, které neobsahují tečku, číslici, \r nebo \n
-   2. S pomocí match.Index a velikosti skladiště spočítat souřadnice symbolu
-   3. Vytvořit instanci souřadnice symbolu
-4. Najít kontejnery sousedící se symbolem
-   1. Vytvořit prázdný seznam kontejnerů
-   2. Spočítat oblast kolem každého kontejneru se vzdáleností 1 od něj z každé strany
-   3. Jestli se ve spočítané oblasti kolem kontejneru nachází symbol, přidat jej do vytvořeného seznamu
-5. Spočítat součet kontejnerů sousedící se symbolem
-   1. Extrahovat ze seznamu instancí kontejnerů sousedících se symboly jejich číslo s pomocí .Select() rozšíření z knihovny LinQ
-   2. Spočítat součet instancí kontejnerů sousedících se symboly s pomocí .Sum() rozšíření z knihovny LinQ
-## Optimalizace
-- Program je napsaný v jazyce C#, který dosahuje větší rychlosti než interpretované jazyky jako např. Python či JavaScript.
-- Publikovaná verze (s optimalizacemi kompilátoru) dosahuje zvýšení výkonu programu až o 25 %.
-- Regular expression vzor je kompilovaný, čímž se snižuje množství času na provedení kroků 1. až 5. až o 23 %.
-- Počítání velikosti skladiště probíhá bez využítí string.Split(). Využití tohoto způsobu by vytvořilo array v paměti velikosti větší než původní vstupní string.
-- Ač může být vstupní řetězec opravdu velký, nevytvářejí se jeho kopie, v paměti existuje jen jednou, existují jen reference na něj.
-- Projekt je sestaven tak, aby výsledný spustitelný program zahrnoval jen ty zabudované knihovny, které opravdu potřebuje, čímž se velikost složky se spustitelným souborem snižuje o více než 100 MB.
-## Výsledek
-- Spočtený výsledek pro velkou mapu: **557705**
-## Extras
-- Při debuggingu se nejen zobrazuje čas, který trvalo hledání výsledku, ale i vizuální výpis kontejnerů do konzole pro lepší představu.
-- Zdrojový kód je napsán anglicky a zároveň obsahuje popisky tříd, metod a vlastností.
 
-Autor: Richard Winter
+# Stáž 2024 – Skladník Eda
+Předtím než nastoupíš do Edhouse, musíš odpracovat zkušební směnu na tzv. *Předůležitém překladišti*. Přece nebudeme do Edhousu brát někoho, kdo nám neukáže, že „za to umí vzít“. Autobus, tě spolu s ostatními stážisty právě vysadil před vraty velké haly překladiště.
+
+„Ach, to je zase den!“ povzdechne si urostlý chlap v ošoupaných monterkách stojící opodál. „Hej ty novej, pocem“ huláká a ukazuje prstem na tebe. “Já su Eda. Potřebuju helfnout.” bručí, zatímco z náprsní kapsy vytahuje aktuální mapku zboží na překladišti.
+
+**Eda potřebuje, abys sečetl čísla aktivních kontejnerů**. Budeš k tomu potřebovat jeho mapku, **kterou najdeš přiloženou k tomuto zadání**. Podívejme se na následující **příklad**:
+|   |   |   |   |   |   |   |   |   |    |
+|---|---|---|---|---|---|---|---|---|----|
+| 4 | 6 | 7 | . | . | 2 | 5 | 7 | . | .  |
+| . | . | . | * | . | . | . | . | . | .  |
+| . | . | 3 | 5 | . | . | 6 | 3 | 3 | .  |
+| . | . | . | . | . | . | # | . | . | .  |
+| 6 | 1 | 7 | * | . | . | . | . | . | .  |
+| . | . | . | . | . | + | . | 1 | 3 | .  |
+| . | . | 5 | 9 | 2 | . | . | . | . | .  |
+| . | . | . | . | . | . | 7 | 5 | 5 | .  |
+| . | . | . | $ | . | * | . | . | . | .  |
+| . | 6 | 6 | 4 | . | 5 | 9 | 8 | . | .  |
+
+Na mapce je vyznačena spousta čísel a symbolů, kterým úplně nerozumíš. To ale nevadí, protože jak Eda prozrazuje, každé číslo, které sousedí s nějakým symbolem, byť diagonálně, je číslo aktivního kontejneru a je nutné ho započítat do výsledné sumy (Tečky (.) nepovažujeme za symbol). Na mapce příkladu jsou dvě čísla, která nejsou čísly aktivního kontejneru, neboť nesousedí s žádným symbolem: 257 (vpravo nahoře) a 13 (vpravo uprostřed). Všechna ostatní čísla sousedí s nějakým symbolem a tudíž se jedná o čísla aktivních kontejnerů; jejich součet je 4361.
+
+## Vstupní data
+Edova skutečná mapka je samozřejmě mnohem větší a najdeš ji vloženou v tomto dokumentu a pro jistotu také přiloženou.
+
+(soubor mapka.txt)
+**Jaký je součet čísel aktivních kontejnerů na Edově mapce?**
+
+## Pokyny
+- Zvolte jazyk a prostředí dle preference – C++ / C# / Java / Python / Rust / JavaScript / TypeScript
+- Napište program, který
+o načte data ze standardního vstupu (STDIN), viz upřesnění níže
+o co nejefektivněji vyřeší výše popsaný úkol
+o vypíše odpověď na standardní výstup (STDOUT)
+- Na adresu specifikovanou v průvodním e-mailu, nejpozději do data uvedeného tamtéž zašlete e-mail,
+obsahující
+o V textu emailu – popis Vámi zvoleného prostředí a zejména instrukce k přeložení a spuštění
+vašeho programu
+o V textu emailu - popis použitého algoritmu
+o V textu emailu – vypočtenou hodnotu
+o V příloze pak přeložitelný (či interpretovatelný) program ve formě zdrojových kódu a všech
+dalších potřebných projektových souborů.
+
+Upřesnění: Chceme, aby bylo možné vaše programy snadno spouštět z příkazové řádky:
+`C:\muj_kod> program.exe < priklad.txt`
+`4361`
+`C:\muj_kod>`
+
+V Pythonu, JS a TS je potřeba něco málo přidat, ale fungovat to bude stejně, např:
+`C:\muj_kod> python program.py < priklad.txt`
+`4361`
+`C:\muj_kod>`
